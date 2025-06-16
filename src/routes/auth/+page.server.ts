@@ -2,11 +2,11 @@ import { redirect } from '@sveltejs/kit'
 
 import type { Actions } from './$types'
 
-import { COOLIFY_URL } from '$env/static/public'
+import { APP_URL } from '$env/static/public'
 
 const getURL = () => {
   let url =
-    COOLIFY_URL ??
+    APP_URL ?? '$env/static/public'
     'http://localhost:5173/';
 
   url = url.startsWith('http') ? url : `https://${url}`;
