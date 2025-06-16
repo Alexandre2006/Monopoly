@@ -6,7 +6,7 @@ COPY package*.json .
 
 RUN npm ci
 
-COPY . .
+COPY .[^.]* .
 RUN npm run build
 
 FROM node:latest AS run
