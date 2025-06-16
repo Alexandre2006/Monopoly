@@ -2,9 +2,9 @@
     import { page } from "$app/state";
 
     // Get name, status, and error message from search params
-    const name = page.url.searchParams.get("name") || "Unknown Auth Error";
-    const status = page.url.searchParams.get("code") || "500";
-    const errorMessage = page.url.searchParams.get("message") || "An unexpected error occurred during authentication.";
+    const name = decodeURIComponent(page.url.searchParams.get("name") || "Unknown Auth Error");
+    const status = decodeURIComponent(page.url.searchParams.get("code") || "500");
+    const errorMessage = decodeURIComponent(page.url.searchParams.get("message") || "An unexpected error occurred during authentication.");
 </script>
 
 <div class="flex-1 flex items-center justify-center p-4">
