@@ -1,4 +1,4 @@
-FROM node:18-alpine AS builder
+FROM node:22-alpine AS builder
 
 WORKDIR /app
 
@@ -15,7 +15,7 @@ RUN npx svelte-kit sync
 # Build the application
 RUN npm run build
 
-FROM node:18-alpine AS runtime
+FROM node:22-alpine AS runtime
 
 WORKDIR /app
 
@@ -29,8 +29,8 @@ RUN npm ci --omit=dev
 
 # Set environment to production
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=80
 
-EXPOSE 3000
+EXPOSE 80
 
 CMD ["node", "build"]
