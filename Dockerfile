@@ -1,27 +1,35 @@
-# ---- Base Node ----
-FROM node:20-alpine AS base
+FROM node:18-alpine AS builder
+
 WORKDIR /app
 
-# ---- Dependencies ----
-FROM base AS deps
-COPY package.json package-lock.json* ./
+# Copy package files
+COPY package*.json ./
 RUN npm ci
 
-# ---- Builder ----
-FROM deps AS builder
+# Copy all source files
 COPY . .
+
+# Explicitly create .svelte-kit directory and generate types
+RUN npx svelte-kit sync
+
+# Build the application
 RUN npm run build
 
-# ---- Pruned Production Dependencies ----
-FROM builder as prod-deps
-RUN npm prune --production
+FROM node:18-alpine AS runtime
 
-# ---- Production ----
-FROM base AS production
+WORKDIR /app
+
+# Copy built assets from builder
+COPY --from=builder /app/build build/
+COPY --from=builder /app/package.json .
+COPY --from=builder /app/package-lock.json .
+
+# Install production dependencies
+RUN npm ci --omit=dev
+
+# Set environment to production
 ENV NODE_ENV=production
-COPY --from=prod-deps /app/package.json .
-COPY --from=prod-deps /app/node_modules ./node_modules
-COPY --from=builder /app/build ./build
+ENV PORT=3000
 
 EXPOSE 3000
 
