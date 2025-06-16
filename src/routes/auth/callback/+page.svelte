@@ -28,7 +28,7 @@
     }
 
     if (session) {
-      goto('/');
+      goto('/games');
     } else {
       goto('/auth');
     }

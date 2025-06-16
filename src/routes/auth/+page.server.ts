@@ -40,7 +40,7 @@ export const actions: Actions = {
       console.error(error)
       redirect(303, `/auth/error?message=${encodeURIComponent(error.message)}&code=${encodeURIComponent(error.status || '500')}&name=${encodeURIComponent(error.name || 'Unknown Auth Error')}`)
     } else {
-      redirect(303, '/private')
+      redirect(303, '/games')
     }
   },
   google: async ({ locals: { supabase } }) => {

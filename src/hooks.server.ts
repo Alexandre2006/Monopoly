@@ -47,12 +47,14 @@ const authGuard: Handle = async ({ event, resolve }) => {
   event.locals.session = session
   event.locals.user = user
 
-  if (!event.locals.session && event.url.pathname.startsWith('/private')) {
+  // Prevent unauthorized access to protected routes
+  if (!event.locals.session && !event.url.pathname.startsWith('/auth') && event.url.pathname !== '/') {
     redirect(303, '/auth')
   }
 
-  if (event.locals.session && event.url.pathname === '/auth') {
-    redirect(303, '/private')
+  // Redirect auth + home page if already authenticated
+  if (event.locals.session && (event.url.pathname === '/auth' || event.url.pathname === '/')) {
+    redirect(303, '/games')
   }
 
   return resolve(event)

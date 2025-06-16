@@ -2,6 +2,12 @@
   import "../app.css";
   import { goto, invalidate } from "$app/navigation";
   import { onMount } from "svelte";
+  import { deleteAccount, getUsername } from "$lib/user";
+  import MaterialSymbolsArrowDownwardRounded from 'virtual:icons/material-symbols/arrow-downward-rounded';
+  import MaterialSymbolsAdd2Rounded from 'virtual:icons/material-symbols/add-2-rounded';
+  import MaterialSymbolsFormatListBulletedRounded from 'virtual:icons/material-symbols/format-list-bulleted-rounded';
+  import MaterialSymbolsSettings from 'virtual:icons/material-symbols/settings';
+  import MaterialSymbolsLogoutRounded from 'virtual:icons/material-symbols/logout-rounded';
 
   let { data, children } = $props();
   let { session, supabase } = $derived(data);
@@ -18,71 +24,74 @@
 
   function handleSignOut() {
     supabase.auth.signOut().then(() => {
-      goto("/");
+      goto("/auth");
     });
   }
 </script>
 
 <div class="min-h-screen flex flex-col">
-<div class="navbar bg-base-100 shadow-sm">
-  <div class="navbar-start">
-    <div class="dropdown">
-      {#if session}
-        <!-- Menu Options Button (Mobile) -->
-        <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h8m-8 6h16"
-            />
-          </svg>
-        </div>
-        <!-- Menu Options (Mobile) -->
-        <ul
-          tabindex="-1"
-          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
-        >
-                <li><a href="/games">My Games</a></li>
-        <li><a href="/new">Create Games</a></li>
-        </ul>
+  <div class="navbar bg-base-100 shadow-sm">
+    <div class="navbar-start">
+      <!-- Logo -->
+       {#if session}
+      <a href="/games" class="btn btn-ghost">
+        <img src="/logo.svg" alt="Logo" class="h-8" />
+      </a>
+      {:else}
+      <a href="/">
+        <img src="/logo.svg" alt="Logo" class="h-8" />
+      </a>
       {/if}
     </div>
 
-    <!-- Logo -->
-    <a href="/">
-      <img src="/logo.svg" alt="Logo" class="h-8" />
-    </a>
-  </div>
-
-  <!-- Menu Options (Desktop) -->
-  <div class="navbar-center hidden lg:flex">
-    <ul class="menu menu-horizontal px-1">
+    <!-- User Actions -->
+    <div class="navbar-end">
       {#if session}
-        <li><a href="/games">My Games</a></li>
-        <li><a href="/new">Create Game</a></li>
+        <div class="dropdown dropdown-end">
+          <div tabindex="0" role="button" class="btn m-1">
+            {#if session.user.user_metadata["avatar_url"]}
+            <div class="avatar">
+              <div class="w-8 rounded-full">
+                <img src={session.user.user_metadata["avatar_url"]} alt="User Avatar" />
+              </div>
+            </div>
+            {:else}
+            <div class="avatar avatar-placeholder">
+              <div class="bg-neutral text-neutral-content w-8 rounded-full">
+                <span class="text-l">{getUsername(session).substring(0,2).toUpperCase()}</span>
+              </div>
+            </div>
+            {/if}
+            <span>{getUsername(session)}</span>
+            <MaterialSymbolsArrowDownwardRounded class="w-5 h-5 ml-2" />
+          </div>
+          <ul
+            tabindex="-1"
+            class="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+          >
+            <li><a href="/games">
+              <MaterialSymbolsFormatListBulletedRounded class="w-5 h-5" />
+              My Games
+            </a></li>
+            <li><a href="/new">
+              <MaterialSymbolsAdd2Rounded class="w-5 h-5" />
+              Create a Game
+            </a></li>
+            <li><a href="/settings">
+              <MaterialSymbolsSettings class="w-5 h-5" />
+              Settings
+            </a></li>
+            <li><button type="button" onclick={handleSignOut} class="text-red-400">
+              <MaterialSymbolsLogoutRounded class="w-5 h-5 rotate-180" />
+              Sign Out
+            </button></li>
+          </ul>
+        </div>
       {:else}
-        <li>It's just shit Monopoly...</li>
+        <a class="btn" href="/auth">Sign in / Register</a>
       {/if}
-    </ul>
+    </div>
   </div>
-
-  <!-- User Actions -->
-  <div class="navbar-end">
-    {#if session}
-      <button class="btn" onclick={handleSignOut}>Sign Out</button>
-    {:else}
-      <a class="btn" href="/auth">Sign in / Register</a>
-    {/if}
-  </div>
-</div>
 
   <div class="bg-base-300 flex-grow flex">
     {@render children()}
