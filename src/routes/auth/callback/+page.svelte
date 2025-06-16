@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { supabase } from "$lib/supabaseClient";
-  import { onMount } from "svelte";
+  let { data } = $props();
+  let { supabase } = $derived(data);  import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import LineMdLoadingLoop from '~icons/line-md/loading-loop';
 
@@ -11,9 +11,8 @@
     const provider = params.get('provider');
 
     if (error) {
-      // Decode the error message and remove any trailing ": Default"
-      const cleanedError = decodeURIComponent(error).replace(': Default', '');
-      goto(`/auth/error?message=${encodeURIComponent(cleanedError)}&code=400&name=${encodeURIComponent(`${provider || 'OAuth'} Error`)}`);
+      // Redirect to error page with error details
+      goto(`/auth/error?message=${encodeURIComponent(error)}&code=400&name=${encodeURIComponent(`${provider || 'OAuth'} Error`)}`);
       return;
     }
 
